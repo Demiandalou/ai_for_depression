@@ -89,7 +89,7 @@ def get_transp(path_,model_lo,num_wor):
 '''
 take path of a video file, split the audio out and cut the audio into pieces,
 then convert each cutted piece of audio to text
-output whole speech from the video
+output whole speech from the video, the transcript is also saved in a txt file
 '''
 def audio_to_text(video_path):
     # Split audio out of video, change sample rate, and cut audio for audio2txt model input
@@ -111,12 +111,12 @@ def audio_to_text(video_path):
     # load pre-trained audio2txt model
     model_lo = speech_model()
     device_ = torch.device('cpu')
-    model_lo.load_state_dict(torch.load('models/sp_model.pt' , map_location=device_))
+    model_lo.load_state_dict(torch.load(os.path.join('utils','models','sp_model.pt') , map_location=device_))
     model_lo.eval()
 
     np_load_old = np.load
     np.load = lambda *a,**k: np_load_old(*a, allow_pickle=True, **k)
-    num_wor = np.load('models/dic.dic.npy').item()
+    num_wor = np.load(os.path.join('utils','models','dic.dic.npy')).item()
     # print('model loaded')
 
     inputf=audio_res.split('.')[0]
@@ -137,8 +137,12 @@ def audio_to_text(video_path):
         except:
             continue
     shutil.rmtree(tmpdir)
+    resfile=open(os.path.join('.',video_name.split('.')[0]+'.txt'),'w')
+    print(res,file=resfile)
+    resfile.close()
     return res
 
 # if __name__ == "__main__":
-#     res=audio_to_text('$DATA/2020-8-14-38.mov')
+#     DATA='/Users/mac/Desktop/my/CI/Depression/BSdata'
+#     res=audio_to_text(os.path.join(DATA,'2020-8-14-38.mov'))
 #     print(res)
