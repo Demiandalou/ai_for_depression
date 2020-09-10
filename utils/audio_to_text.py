@@ -14,7 +14,7 @@ import torchaudio as ta
 import torch
 import time
 import shutil
-
+MODEL_PATH='/Users/mac/Desktop'
 CutTimeDef=15
 
 '''
@@ -111,7 +111,7 @@ def audio_to_text(video_path):
     # load pre-trained audio2txt model
     model_lo = speech_model()
     device_ = torch.device('cpu')
-    model_lo.load_state_dict(torch.load(os.path.join('utils','models','sp_model.pt') , map_location=device_))
+    model_lo.load_state_dict(torch.load(os.path.join(MODEL_PATH,'sp_model.pt') , map_location=device_))
     model_lo.eval()
 
     np_load_old = np.load
