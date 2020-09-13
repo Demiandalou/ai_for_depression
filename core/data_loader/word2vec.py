@@ -14,22 +14,30 @@ from audio_to_text import audio_to_text
 import jieba
 
 
-def word2vec(video_path):
+def word2vec(transp_path):
     '''from video or from existing transcript'''
-    # res=audio_to_text(video_path) # to get transcript from video, uncomment this and comment the line below
-    txtfile=open(video_path.split('/')[-1].split('.')[0]+'.txt','r')
-    res=''.join([line.strip('\n') for line in txtfile.readlines()])
+    # res=audio_to_text(video_path) # to get transcript from video, uncomment this and comment the two lines below
+    txtfiles=os.listdir(transp_path)
+    for f in txtfiles:
+        if f[0]=='.':
+            txtfiles.remove(f)
+    allres=''
+    for f in txtfiles:
+        txtfile=open(os.path.join(transp_path,f),'r')
+        # txtfile=open(video_path.split('/')[-1].split('.')[0]+'.txt','r')
+        res=''.join([line.strip('\n') for line in txtfile.readlines()])
 
-    # split words using jieba
-    sentence_seg = jieba.cut(res)
-    result = ' '.join(sentence_seg)
+        # split words using jieba
+        sentence_seg = jieba.cut(res)
+        result = ' '.join(sentence_seg)
 
-    # remove stopwords
-    stopwords = [line.strip() for line in open(os.path.join('utils','chi_stopwords.txt'),encoding='UTF-8').readlines()]
-    res=' '.join([word for word in result.split(' ') if word not in stopwords])
+        # remove stopwords
+        stopwords = [line.strip() for line in open(os.path.join('utils','chi_stopwords.txt'),encoding='UTF-8').readlines()]
+        res=' '.join([word for word in result.split(' ') if word not in stopwords])
+        allres+=res
 
     with open('tmp.txt', 'w',encoding="utf-8") as f2:
-        f2.write(result)
+        f2.write(allres)
     sentence = w2v.LineSentence('tmp.txt')
     model= Word2Vec(sentence,min_count=1)
     if os.path.exists("tmp.txt"):
@@ -44,5 +52,6 @@ def word2vec(video_path):
     return model
 
 # if __name__ == "__main__":
-#     DATA='/Users/mac/Desktop/my/CI/Depression/BSdata'
-#     word2vec(os.path.join(DATA,'2020-8-14-38.mov'))
+    # DATA='/Users/mac/Desktop/my/CI/Depression/BSdata'
+    # w2vmodel=word2vec(os.path.join(DATA,'2020-8-14-38.mov'))
+    # w2vmodel=word2vec(os.path.join('utils','transcript'))
